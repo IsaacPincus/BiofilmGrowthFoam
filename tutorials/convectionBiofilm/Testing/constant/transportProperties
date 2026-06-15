@@ -1,0 +1,22 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.1                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+D              [0 2 -1 0 0 0 0] 1e-9;         // Diffusivity of scalar field
+Ks              [0 -3 0 0 1 0 0] 0.1;          // Monod half-saturation constant
+mu              [0 0 -1 0 0 0 0] 1.95e-6;      // maximum growth rate for biofilm
+Y               [0 0 0 0 0 0 0] 0.15;          // Yield of biomass
+

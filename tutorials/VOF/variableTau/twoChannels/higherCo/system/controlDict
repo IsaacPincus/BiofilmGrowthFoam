@@ -1,0 +1,142 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     myInterFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         5.0;
+
+deltaT          1e-8;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           2.0;
+maxAlphaCo      0.4;
+
+maxDeltaT       1;
+
+libs
+(
+    "libHerschelBulkleySpatial.so"
+);
+
+
+// functions
+// {
+//     residuals
+//     {
+//         type            solverInfo;
+//         libs            ("libutilityFunctionObjects.so");
+//         fields          (U p_rgh alpha.water tau0);
+//     }
+
+//     runTimeControl
+//     {
+//         type            runTimeControl;
+//         libs            ("libutilityFunctionObjects.so");
+
+//         conditions
+//         {
+//             condition0
+//             {
+//                 type            minMaxCondition;
+//                 functionObject  residuals;
+//                 fieldName       initial(mag(U));
+//                 mode            minimum;
+//                 value           1e-6;    // stop when residual drops below this
+//             }
+//         }
+
+//         satisfiedAction stopNow;
+//     }
+// }
+
+functions
+{
+    magU
+    {
+        type            mag;
+        libs            ("libfieldFunctionObjects.so");
+        field           U;
+        result          magU;
+        writeControl    none;
+    }
+
+    runTimeControl
+    {
+        type            runTimeControl;
+        libs            ("libutilityFunctionObjects.so");
+
+        conditions
+        {
+            // condition0
+            // {
+            //     type            average;
+            //     functionObject  steadyState;
+            //     fields          (U);
+            //     window          50;       // must be stable for this many steps
+            //     tolerance       1e-5;     // relative change tolerance
+            //     groupID         0;
+            // }
+            condition1
+            {
+                type            equationInitialResidual;
+                fields          (p_rgh);
+                // window          50;       // must be stable for this many steps
+                value           1e-5;     // relative change tolerance
+                mode            minimum;
+                // groupID         0;
+            }
+            // condition1
+            // {
+            //     type            minMax;
+            //     fields          (magU);
+            //     // window          50;       // must be stable for this many steps
+            //     value           1e-5;     // relative change tolerance
+            //     mode            minimum;
+            //     // groupID         0;
+            // }
+        }
+
+        satisfiedAction end;
+    }
+}
+
+// ************************************************************************* //

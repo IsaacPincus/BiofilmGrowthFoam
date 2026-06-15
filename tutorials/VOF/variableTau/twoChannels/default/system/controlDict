@@ -1,0 +1,91 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     myInterFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.2;
+
+deltaT          1e-8;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.002;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           2.0;
+maxAlphaCo      0.8;
+
+maxDeltaT       0.01;
+
+libs
+(
+    "libHerschelBulkleySpatial.so"
+);
+
+// alphaFluxMonitor
+// {
+//     type            fieldMinMax;
+//     libs            (fieldFunctionObjects);
+//     writeControl    timeStep;
+//     writeInterval   1;
+//     fields          (alphaPhi0.water);
+//     mode            magnitude;
+// }
+
+// runTimeControl
+// {
+//     type            runTimeControl;
+//     libs            (utilityFunctionObjects);
+
+//     conditions
+//     {
+//         condition0
+//         {
+//             type            average;
+//             functionObject  alphaFluxMonitor;
+//             fields          (max(alphaPhi0.water));
+//             tolerance       1e-8;
+//             window          50;
+//             windowType      exact;
+//         }
+//     }
+
+//     satisfiedAction end;
+// }
+
+// ************************************************************************* //

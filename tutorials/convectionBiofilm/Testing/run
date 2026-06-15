@@ -1,0 +1,18 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application=$(getApplication)
+
+rm -rf 0/
+runApplication blockMesh
+runApplication topoSet
+runApplication subsetMesh boxCells -overwrite -patch walls
+cp -r 0.orig/ 0/
+python3 dirtyChangeB.py
+# runApplication setFields
+runApplication $application
+
+#------------------------------------------------------------------------------
