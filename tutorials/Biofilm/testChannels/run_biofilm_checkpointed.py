@@ -42,11 +42,12 @@ import fluidfoam
 from PIL import Image
 import shutil
 import pickle
+import time
 
 # ============================================================
 # Restart / checkpoint configuration
 # ============================================================
-RESUME_MODE = "fresh"          # "auto" | "fresh" | "restart" | "bootstrap"
+RESUME_MODE = "auto"          # "auto" | "fresh" | "restart" | "bootstrap"
 CHECKPOINT_DIR = "./checkpoints"
 
 # Bootstrap only: if True, always reset Bdead to zero instead of trying to read it
@@ -244,7 +245,7 @@ Diffusivity = 1e-8
 
 # # timestep for each removal/growth step, in seconds
 dt = 1800
-no_steps = 5
+no_steps = 7
 
 dt_yield = 5e-1
 dt_convection = 3
@@ -550,6 +551,7 @@ if start_step >= no_steps:
     print(f"Nothing to do: start_step={start_step} >= no_steps={no_steps}")
 
 for step in range(start_step, no_steps):
+    t_start = time.perf_counter()
     print(f"\n=== step {step} / {no_steps - 1} ===")
     # run the yield stress case (processors already hold the start-time fields:
     # from prepare_parallel on the first iteration, or from the end-of-step
@@ -714,6 +716,8 @@ for step in range(start_step, no_steps):
         rng_state=rng.bit_generator.state,
         np_random_state=np.random.get_state(),
     )
+
+    print(f"  step {step} took {time.perf_counter() - t_start:.1f}s")
 
     # now let's see if it worked!
 
