@@ -53,6 +53,22 @@ CHECKPOINT_DIR = "./checkpoints"
 # from the existing case folder.
 BOOTSTRAP_FORCE_ZERO_BDEAD = False
 
+# ============================================================
+# Parallel (MPI) configuration
+# ============================================================
+# When True, the two OpenFOAM solver calls are run with MPI. The biofilm
+# growth/division (numpy) stays serial; the Python loop reconstructs the fields
+# back to a single domain after each solve so the image<->cell mapping still
+# works. Set False for the original serial behaviour.
+#
+# IMPORTANT: cpus MUST equal numberOfSubdomains in each case's
+# system/decomposeParDict. This script (re)writes that dict to match N_CPUS, so
+# just set N_CPUS here. Your custom solvers must be parallel-safe (they are, as
+# long as they only use standard fvm/fvc operators and per-cell local logic).
+RUN_PARALLEL = True
+N_CPUS = 4
+DECOMP_METHOD = "scotch"      # "scotch" (no coeffs needed) or "simple", etc.
+
 
 def _time_dirs(case_path):
     """Return sorted [(time, dirname)] for numeric time directories in a case."""
@@ -124,6 +140,69 @@ def load_checkpoint(path):
         return pickle.load(fh)
 
 
+# ============================================================
+# Parallel / decomposition helpers
+# ============================================================
+_DECOMPOSE_DICT_TEMPLATE = """\
+/*--------------------------------*- C++ -*----------------------------------*\\
+| =========                 |                                                 |
+| \\\\      /  F ield         | OpenFOAM                                        |
+|  \\\\    /   O peration     |                                                 |
+|   \\\\  /    A nd           |                                                 |
+|    \\\\/     M anipulation  |                                                 |
+\\*---------------------------------------------------------------------------*/
+FoamFile
+{{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
+}}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+numberOfSubdomains {n};
+method          {method};
+
+// ************************************************************************* //
+"""
+
+
+def write_decompose_dict(case_path, n, method):
+    """(Re)write system/decomposeParDict so numberOfSubdomains matches N_CPUS."""
+    path = os.path.join(case_path, "system", "decomposeParDict")
+    with open(path, "w") as fh:
+        fh.write(_DECOMPOSE_DICT_TEMPLATE.format(n=n, method=method))
+
+
+def remove_processor_dirs(case_path):
+    """Delete all processorN directories (start each run from a clean decomposition)."""
+    for name in os.listdir(case_path):
+        if name.startswith("processor") and os.path.isdir(os.path.join(case_path, name)):
+            shutil.rmtree(os.path.join(case_path, name))
+
+
+def prepare_parallel(case, case_path, resume_time, n, method):
+    """Build a fresh decomposition for `case` from its current serial state.
+
+    Wipes any stale processor dirs, writes the decomposeParDict, decomposes the
+    mesh, and guarantees the serial fields at `resume_time` are present on the
+    processors (so the first parallel solve starts from the right state)."""
+    remove_processor_dirs(case_path)
+    write_decompose_dict(case_path, n, method)
+    case.run(["decomposePar", "-force"])                       # mesh (+ start fields)
+    case.run(["decomposePar", "-fields", "-time", str(resume_time), "-force"])
+
+
+def push_fields(case, time):
+    """Decompose the serial fields at `time` onto the (already meshed) processors."""
+    case.run(["decomposePar", "-fields", "-time", str(time), "-force"])
+
+
+def pull_latest(case):
+    """Reconstruct only the newest processor time back to a serial time directory."""
+    case.run(["reconstructPar", "-latestTime"])
+
+
 # we're going to create an array and use it as the basis for the calculations
 # We have the following, all the same size:
 #   mask, 1s for free regions, 0s for grains
@@ -157,15 +236,15 @@ tauDead = 4e-4
 # kdet = 1/36000
 
 mu = 6e-4       # maximum growth rate for biofilm, [1/s]
-Ks = 0.1           # Monod half-saturation constant, [mol/m^3]
+Ks = 5.0           # Monod half-saturation constant, [mol/m^3]
 Yield = 0.3       # Yield of biomass
 # kd = 2e-6          # biomass decay constant, [1/s]
 kd = 0
 Diffusivity = 1e-8
 
 # # timestep for each removal/growth step, in seconds
-dt = 1200
-no_steps = 70
+dt = 1800
+no_steps = 5
 
 dt_yield = 5e-1
 dt_convection = 3
@@ -451,6 +530,20 @@ else:
 
 #%%
 ######################################################################
+# Parallel preparation: build a clean decomposition from the current
+# serial state (works the same for fresh / restart / bootstrap, since
+# each branch above leaves caseX[-1] at the correct resume time).
+######################################################################
+if RUN_PARALLEL:
+    print(f"Preparing parallel run on {N_CPUS} subdomains ({DECOMP_METHOD}) ...")
+    prepare_parallel(caseYieldStress, pathYieldStress,
+                     caseYieldStress[-1].name, N_CPUS, DECOMP_METHOD)
+    prepare_parallel(caseConvection, pathConvection,
+                     caseConvection[-1].name, N_CPUS, DECOMP_METHOD)
+
+
+#%%
+######################################################################
 # time loop starts here
 ######################################################################
 if start_step >= no_steps:
@@ -458,8 +551,14 @@ if start_step >= no_steps:
 
 for step in range(start_step, no_steps):
     print(f"\n=== step {step} / {no_steps - 1} ===")
-    # run the yield stress case
-    caseYieldStress.run("biofilmYieldFoam")
+    # run the yield stress case (processors already hold the start-time fields:
+    # from prepare_parallel on the first iteration, or from the end-of-step
+    # push_fields() below on subsequent ones)
+    if RUN_PARALLEL:
+        caseYieldStress.run("biofilmYieldFoam", parallel=True, cpus=N_CPUS)
+        pull_latest(caseYieldStress)        # reconstruct -> serial for the numpy step
+    else:
+        caseYieldStress.run("biofilmYieldFoam")
 
     # Copy B, U values to convection case
     with caseYieldStress[-1]["B"] as field:
@@ -472,7 +571,13 @@ for step in range(start_step, no_steps):
     with caseConvection[-1]["U"] as field:
         field.internal_field = UField
 
-    caseConvection.run("convectionWithBiomassFoam")
+    if RUN_PARALLEL:
+        # push the just-written serial B, U onto the processors, then solve
+        push_fields(caseConvection, caseConvection[-1].name)
+        caseConvection.run("convectionWithBiomassFoam", parallel=True, cpus=N_CPUS)
+        pull_latest(caseConvection)
+    else:
+        caseConvection.run("convectionWithBiomassFoam")
 
     # now we grow the biofilm. For now we won't have any dead biofilm
     with caseConvection[-1]["C"] as field:  # read concentration field
@@ -576,17 +681,24 @@ for step in range(start_step, no_steps):
         CFieldCopy = field.internal_field
     with caseYieldStress[-1]["C"] as field:
         field.internal_field = CFieldCopy
+        field.dimensions = foamlib.DimensionSet(length=-3, moles=1)
         field.boundary_field = {
             "walls": {"type": "zeroGradient"},
             "inlet": {"type": "zeroGradient"},
             "outlet": {"type": "zeroGradient"},
-            "emptyFaces": {"type": "zeroGradient"},
+            "emptyFaces": {"type": "empty"},
         }
 
     with caseYieldStress.control_dict as f:
         f["endTime"] = dt*step + dt_yield
     with caseConvection.control_dict as f:
         f["endTime"] = f["endTime"] + dt_convection
+
+    # push the freshly-written serial yield fields onto the processors so the
+    # next step's parallel solve starts from them (mesh is unchanged, so this is
+    # a cheap -fields decomposition, not a full re-decomposition)
+    if RUN_PARALLEL:
+        push_fields(caseYieldStress, caseYieldStress[-1].name)
 
     # ------------------------------------------------------------
     # checkpoint: written LAST, after every field + controlDict update,

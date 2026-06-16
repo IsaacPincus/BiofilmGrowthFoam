@@ -46,7 +46,7 @@ import pickle
 # ============================================================
 # Restart / checkpoint configuration
 # ============================================================
-RESUME_MODE = "fresh"          # "auto" | "fresh" | "restart" | "bootstrap"
+RESUME_MODE = "bootstrap"          # "auto" | "fresh" | "restart" | "bootstrap"
 CHECKPOINT_DIR = "./checkpoints"
 
 # Bootstrap only: if True, always reset Bdead to zero instead of trying to read it
@@ -159,8 +159,7 @@ tauDead = 4e-4
 mu = 6e-4       # maximum growth rate for biofilm, [1/s]
 Ks = 0.1           # Monod half-saturation constant, [mol/m^3]
 Yield = 0.3       # Yield of biomass
-# kd = 2e-6          # biomass decay constant, [1/s]
-kd = 0
+kd = 2e-6          # biomass decay constant, [1/s]
 Diffusivity = 1e-8
 
 # # timestep for each removal/growth step, in seconds

@@ -278,8 +278,6 @@ for step in range(1,no_steps):
             random_coord = final_neighbors[random_valid_idx]
             Balive2D[random_coord[0], random_coord[1]] += Balive2D[i,j]/2
     
-
-
     # create a new folder in YieldStress at the given timestep
     folderTimeName = caseYieldStress[-1].name
     print(folderTimeName)

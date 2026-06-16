@@ -52,6 +52,9 @@ VTK/
 *.foam
 *.OpenFOAM
 
+# checkpoint files
+*.pkl
+
 # Runtime-compiled code (codedFixedValue, codedFunctionObject, ...)
 dynamicCode/
 
