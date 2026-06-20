@@ -1,5 +1,5 @@
 EXE_INC = \
-    -I/usr/lib/openfoam/openfoam2512/applications/solvers/multiphase/VoF \
+    -I$(FOAM_SOLVERS)/multiphase/VoF \
     -I$(LIB_SRC)/phaseSystemModels/twoPhaseInter/incompressibleInterPhaseTransportModel/lnInclude \
     -I$(LIB_SRC)/phaseSystemModels/twoPhaseInter/VoFphaseIncompressibleTurbulenceModels/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
