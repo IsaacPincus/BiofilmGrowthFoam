@@ -47,7 +47,7 @@ import time
 # ============================================================
 # Restart / checkpoint configuration
 # ============================================================
-RESUME_MODE = "auto"          # "auto" | "fresh" | "restart" | "bootstrap"
+RESUME_MODE = "fresh"          # "auto" | "fresh" | "restart" | "bootstrap"
 CHECKPOINT_DIR = "./checkpoints"
 
 # Bootstrap only: if True, always reset Bdead to zero instead of trying to read it
@@ -66,8 +66,8 @@ BOOTSTRAP_FORCE_ZERO_BDEAD = False
 # system/decomposeParDict. This script (re)writes that dict to match N_CPUS, so
 # just set N_CPUS here. Your custom solvers must be parallel-safe (they are, as
 # long as they only use standard fvm/fvc operators and per-cell local logic).
-RUN_PARALLEL = True
-N_CPUS = 4
+RUN_PARALLEL = False
+N_CPUS = 1
 DECOMP_METHOD = "scotch"      # "scotch" (no coeffs needed) or "simple", etc.
 
 

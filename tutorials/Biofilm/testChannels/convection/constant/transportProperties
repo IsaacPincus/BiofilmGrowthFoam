@@ -17,7 +17,7 @@ FoamFile
 
 D [0 2 -1 0 0 0 0] 1e-08;         // Diffusivity of scalar field
 
-Ks 0.1;          // Monod half-saturation constant
+Ks 5.0;          // Monod half-saturation constant
 
 mu 0.0006;      // maximum growth rate for biofilm
 
