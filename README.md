@@ -1,6 +1,18 @@
-Steps you need to do:
+Steps you need to do, as per https://gitlab.com/openfoam/core/openfoam/-/wikis/precompiled/debian:
 
-```sudo apt install openfoam2512-default```
+```
+# Add the repository
+curl -s https://dl.openfoam.com/add-debian-repo.sh | sudo bash
+
+# Update the repository information
+sudo apt-get update
+
+# Install preferred package. Eg,
+sudo apt-get install openfoam2512-default
+
+# Use the openfoam shell session. Eg,
+openfoam2512
+```
 
 create a python venv
 ```
