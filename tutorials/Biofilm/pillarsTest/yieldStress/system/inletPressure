@@ -1,0 +1,12 @@
+type            surfaceFieldValue;
+libs            ("libfieldFunctionObjects.so");
+executeControl  timeStep;
+writeControl    timeStep;
+writeInterval   1;
+
+regionType      patch;
+name            inlet;
+
+operation       areaAverage;
+fields          ( p );
+writeFields     false;

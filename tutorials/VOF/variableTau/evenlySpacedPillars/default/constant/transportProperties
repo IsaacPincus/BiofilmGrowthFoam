@@ -27,23 +27,23 @@ water
 biofilm
 {
 
-    // transportModel  HerschelBulkleySpatial; 
-    // HerschelBulkleySpatialCoeffs
-    // {
-    //     nu0      [ 0 2 -1 0 0 0 0 ] 1e2;
-    //     // tau0     [ 0 2 -2 0 0 0 0 ] 2e-3;
-    //     k        [ 0 2 -1 0 0 0 0 ] 1e-6;
-    //     n        [ 0 0 0 0 0 0 0 ] 1;
-    // }       
-
-    transportModel  HerschelBulkley; 
-    HerschelBulkleyCoeffs
+    transportModel  HerschelBulkleySpatial; 
+    HerschelBulkleySpatialCoeffs
     {
-    nu0      [ 0 2 -1 0 0 0 0 ] 1e2;
-    tau0     [ 0 2 -2 0 0 0 0 ] 4e-3;
-    k        [ 0 2 -1 0 0 0 0 ] 1e-6;
-    n        [ 0 0 0 0 0 0 0 ] 1;
-    }
+        nu0      [ 0 2 -1 0 0 0 0 ] 1e4;
+        // tau0     [ 0 2 -2 0 0 0 0 ] 2e-3;
+        k        [ 0 2 -1 0 0 0 0 ] 1e-6;
+        n        [ 0 0 0 0 0 0 0 ] 1;
+    }       
+
+    // transportModel  HerschelBulkley; 
+    // HerschelBulkleyCoeffs
+    // {
+    // nu0      [ 0 2 -1 0 0 0 0 ] 1e4;
+    // tau0     [ 0 2 -2 0 0 0 0 ] 0.1;
+    // k        [ 0 2 -1 0 0 0 0 ] 1e-6;
+    // n        [ 0 0 0 0 0 0 0 ] 1;
+    // }
     
     // transportModel  Newtonian;
     // nu              1.48e-05;

@@ -57,6 +57,39 @@ libs
     "libHerschelBulkleySpatial.so"
 );
 
+functions
+{
+    inletPressure
+    {
+        type            surfaceFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+        executeControl  timeStep;
+        writeControl    timeStep;
+        writeInterval   1;
+
+        regionType      patch;
+        name            inlet;          // your inlet patch name from boundary file
+
+        operation       areaAverage;
+        fields          ( p );
+    }
+
+    outletPressure
+    {
+        type            surfaceFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+        executeControl  timeStep;
+        writeControl    timeStep;
+        writeInterval   1;
+
+        regionType      patch;
+        name            outlet;         // your outlet patch name
+
+        operation       areaAverage;
+        fields          ( p );
+    }
+}
+
 // alphaFluxMonitor
 // {
 //     type            fieldMinMax;

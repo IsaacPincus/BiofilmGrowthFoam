@@ -21,7 +21,7 @@ defaultFieldValues
     volScalarFieldValue tau0 0.0
 );
 
-tau0Biofilm 4e-3;
+tau0Biofilm 0.1;
 
 regions
 (
