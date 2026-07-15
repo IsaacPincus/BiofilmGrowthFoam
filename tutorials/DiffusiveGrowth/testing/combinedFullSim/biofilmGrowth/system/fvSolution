@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    C
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-6;
+        relTol          0;
+        norm            default;
+    }
+    // symmetric matrix, small tolerance for B
+    B
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-9;
+        relTol          0;
+        norm            default;
+    }
+    A
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-6;
+        relTol          0;
+        norm            default;
+    }
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 0;
+}
+
+biofilm
+{
+    maxPicard       20;
+    picardTol       1e-6;
+    capFrac         1e-2;    // evaluate D(B) no closer than this to B = 1
+    DBmaxRatio      1e8;     // hard ceiling on D(B), as a multiple of delta
+    DBrelax         1.0;     // 1.0 = no coefficient under-relaxation
+}
+
+
+// ************************************************************************* //

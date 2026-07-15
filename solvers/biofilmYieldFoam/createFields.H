@@ -45,12 +45,13 @@ volScalarField B
     mesh
 );
 
-Info<< "Reading dead biofilm field Bdead\n" << endl;
-volScalarField Bdead
+// the following are carried by the current script for use with biomassGrowthFoam
+Info<< "Reading autoinducer concentration A, this must be present but is not convected\n" << endl;
+volScalarField A
 (
     IOobject
     (
-        "Bdead",
+        "A",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
@@ -58,6 +59,33 @@ volScalarField Bdead
     ),
     mesh
 );
+Info<< "Reading substrate concentration C, this must be present but is not convected\n" << endl;
+volScalarField C
+(
+    IOobject
+    (
+        "C",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+// Info<< "Reading dead biofilm field Bdead\n" << endl;
+// volScalarField Bdead
+// (
+//     IOobject
+//     (
+//         "Bdead",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::MUST_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     mesh
+// );
 
 Info<< "Reading transportProperties\n" << endl;
 immiscibleIncompressibleTwoPhaseMixture mixture(U, phi);

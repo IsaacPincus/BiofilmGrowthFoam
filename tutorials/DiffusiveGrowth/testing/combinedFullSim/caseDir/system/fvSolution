@@ -1,0 +1,122 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    alpha.water
+    {
+        nAlphaCorr      1;
+        nAlphaSubCycles 2;
+        cAlpha          1;
+    }
+
+    "pcorr.*"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-10;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-07;
+        relTol          0.05;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        tolerance       1e-07;
+        relTol          0;
+    }
+
+    U
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    tau0
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-8;
+        relTol          0.1;
+    }
+
+    tau0Final
+    {
+        $tau0;           // inherit all settings from tau0
+        relTol          0;  // but tighten tolerance for final iteration
+    }
+
+    // for biofilm growtih
+    C
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-6;
+        relTol          0;
+        norm            default;
+    }
+    B
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-9;
+        relTol          0;
+        norm            default;
+    }
+    A
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-6;
+        relTol          0;
+        norm            default;
+    }
+
+}
+
+PIMPLE
+{
+    momentumPredictor no;
+    nCorrectors     3;
+    nNonOrthogonalCorrectors 0;
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 0;
+}
+
+biofilm
+{
+    maxPicard       20;
+    picardTol       1e-6;
+    capFrac         1e-2;    // evaluate D(B) no closer than this to B = 1
+    DBmaxRatio      1e8;     // hard ceiling on D(B), as a multiple of delta
+    DBrelax         1.0;     // 1.0 = no coefficient under-relaxation
+}
+
+
+// ************************************************************************* //

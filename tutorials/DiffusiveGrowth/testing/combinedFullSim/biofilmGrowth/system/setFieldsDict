@@ -1,0 +1,64 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM                                        |
+|  \\    /   O peration     |                                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+defaultFieldValues
+(
+    volScalarFieldValue B 0
+);
+
+regions
+(
+    // --- blob 1: lower ---
+    cylinderToCell
+    {
+        p1     (290e-6  75e-6  -1);   // z-span deliberately overshoots the
+        p2     (290e-6  75e-6   1);   // domain, so mesh thickness doesn't matter
+        radius 20e-6;
+
+        fieldValues
+        (
+            volScalarFieldValue B 0.8
+        );
+    }
+
+    // --- blob 2: middle ---
+    cylinderToCell
+    {
+        p1     (290e-6 150e-6  -1);
+        p2     (290e-6 150e-6   1);
+        radius 20e-6;
+
+        fieldValues
+        (
+            volScalarFieldValue B 0.8
+        );
+    }
+
+    // --- blob 3: upper ---
+    cylinderToCell
+    {
+        p1     (290e-6 225e-6  -1);
+        p2     (290e-6 225e-6   1);
+        radius 20e-6;
+
+        fieldValues
+        (
+            volScalarFieldValue B 0.8
+        );
+    }
+);
+
+// ************************************************************************* //

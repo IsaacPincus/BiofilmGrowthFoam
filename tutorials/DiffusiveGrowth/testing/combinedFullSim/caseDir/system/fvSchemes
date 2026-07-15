@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+}
+
+divSchemes
+{
+    // for yield stress
+    div(rhoPhi,U)  Gauss upwind;
+    div(phi,alpha)  Gauss vanLeer;
+    div(phi,alpha.water) Gauss vanLeer;
+    // div(alphaPhi0.water,tau0) Gauss vanLeer;
+    div(phi,tau0) Gauss vanLeer;
+    div(phi,B) Gauss vanLeer;
+    div(phirb,alpha) Gauss linear;
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+
+    // for biofilm growth
+    div(phi,C)      Gauss linearUpwind grad(C);
+    div(phi,A)      Gauss linearUpwind grad(A);
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+    // for biofilmGrowth
+    laplacian(D,C)  Gauss linear corrected;
+    laplacian(DB,B) Gauss linear corrected;
+    laplacian(DA,A) Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+    // for biofilm growth
+    interpolate(DB) harmonic;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+
+// ************************************************************************* //

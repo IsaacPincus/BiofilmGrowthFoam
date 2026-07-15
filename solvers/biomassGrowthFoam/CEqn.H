@@ -7,7 +7,7 @@ while (simple.correctNonOrthogonal())
         fvm::ddt(C) 
         + fvm::div(phi,C) 
         - fvm::laplacian(D,C)
-        + fvm::Sp(mu*B/(Ks + C)/Y, C) // implicit treatment of source term
+        + fvm::Sp(mu/Y*Binf*B/(Ks + C), C) // implicit treatment of source term
         // ==
         // fvOptions(C)
         // - mu*B*C/(Ks + C)/Y // biomass consumption, Monod kinetics

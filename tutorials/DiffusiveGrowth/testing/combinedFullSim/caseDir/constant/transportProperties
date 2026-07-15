@@ -1,0 +1,79 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+phases (water biofilm);
+
+water
+{
+    transportModel  Newtonian;
+    nu              1e-06;
+    rho             1000;
+}
+
+biofilm
+{
+
+    transportModel  HerschelBulkleySpatial; 
+    HerschelBulkleySpatialCoeffs
+    {
+        nu0      [ 0 2 -1 0 0 0 0 ] 1e2;
+        // tau0     [ 0 2 -2 0 0 0 0 ] 2e-3;
+        k        [ 0 2 -1 0 0 0 0 ] 1e-6;
+        n        [ 0 0 0 0 0 0 0 ] 1;
+    }       
+
+    // transportModel  HerschelBulkley; 
+    // HerschelBulkleyCoeffs
+    // {
+    // nu0      [ 0 2 -1 0 0 0 0 ] 1e2;
+    // tau0     [ 0 2 -2 0 0 0 0 ] 2e-3;
+    // k        [ 0 2 -1 0 0 0 0 ] 1e-6;
+    // n        [ 0 0 0 0 0 0 0 ] 1;
+    // }
+    
+    // transportModel  Newtonian;
+    // nu              1.48e-05;
+
+    rho             1200;
+}
+
+sigma           0.0;
+
+
+// everything for biomassGrowth
+D     [0 2 -1 0 0 0 0] 1e-09;         // Diffusivity of limiting nutrient
+
+Binf  [1 -3 0 0 0 0 0]   100;      // kg/m^3 wet (not dry!!) biomass + EPS at maximum capacity
+Y     [1 0 0 0 -1 0 0]   0.0055;   // kg biomass per mol substrate, yield
+Ks    [0 -3 0 0 1 0 0]   5.0;      // mol/m^3, Monod half-saturation constant, same units as C
+mu    [0 0 -1 0 0 0 0]  1.2e-3;   // biofilm maximum growth rate
+
+// all the factors for biomass diffusivity calculations
+delta [0 2 -1 0 0 0 0]  1e-17;   // biomass spreading prefactor
+a       4;
+b       4;
+
+// for autoinducer concentrations
+DA        [0 2 -1 0 0 0 0]   5e-10;   // AI-2 diffusivity in water
+kAplus    [0 -3 -1 0 1 0 0]  2.7778e-4;     // per second, gonna just set it to 1 mol/h to start
+kAminus   [0 -3 -1 0 1 0 0]  2.5e-4;  // 90% of production rate, arbitrary to start
+// kAplus    [0 -3 -1 0 1 0 0]  1e-8;     // per second, gonna just set it to 1 mol/h to start
+// kAminus   [0 -3 -1 0 1 0 0]  0.0;  // 90% of production rate, arbitrary to start
+Cstar     [0 -3 0 0 1 0 0]   5.0;    // C threshold at which autoinducer uptake begins
+wSwitch   [0 -3 0 0 1 0 0]   0.005;   // transition width
+
+// ************************************************************************* //

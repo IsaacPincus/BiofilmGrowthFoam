@@ -24,18 +24,18 @@
     // B = max(B, dimensionedScalar("zero", dimViscosity/dimTime, 0.0));
 }
 
-// Advect Bdead field with phase-1 flux
-{
-    fvScalarMatrix BdeadEqn
-    (
-        fvm::ddt(Bdead)
-    //   + fvm::div(alphaPhi10, B)
-        + fvm::div(phi,Bdead)
-    );
-    BdeadEqn.solve();
+// // Advect Bdead field with phase-1 flux
+// {
+//     fvScalarMatrix BdeadEqn
+//     (
+//         fvm::ddt(Bdead)
+//     //   + fvm::div(alphaPhi10, B)
+//         + fvm::div(phi,Bdead)
+//     );
+//     BdeadEqn.solve();
 
-    // // Ensure physical bounds
-    // B = max(B, dimensionedScalar("zero", dimViscosity/dimTime, 0.0));
-}
+//     // // Ensure physical bounds
+//     // B = max(B, dimensionedScalar("zero", dimViscosity/dimTime, 0.0));
+// }
 
 

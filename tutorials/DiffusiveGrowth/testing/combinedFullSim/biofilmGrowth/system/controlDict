@@ -1,21 +1,20 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  7
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system";
     object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     biofilmYieldFoam;
+application     biomassGrowthFoam;
 
 startFrom       latestTime;
 
@@ -23,13 +22,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime 111601.8;
+endTime         7200.0;
 
-deltaT          1e-8;
+deltaT          1;
 
 writeControl    adjustableRunTime;
 
-writeInterval 0.1;
+writeInterval   1800;
 
 purgeWrite      0;
 
@@ -41,22 +40,14 @@ writeCompression off;
 
 timeFormat      general;
 
-timePrecision   9;
+timePrecision   6;
 
-runTimeModifiable yes;
+runTimeModifiable true;
 
-adjustTimeStep  yes;
+// adjustTimeStep  yes;
 
-maxCo           0.4;
-maxAlphaCo      0.2;
-
-maxDeltaT       0.01;
-
-libs
-(
-    "libHerschelBulkleySpatial.so"
-);
-
-
+// maxCo           0.15;
+// maxAlphaCo      0.15;
+// maxDeltaT       1e-1;
 
 // ************************************************************************* //

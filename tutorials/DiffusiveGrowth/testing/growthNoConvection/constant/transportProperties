@@ -1,0 +1,28 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.1                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+D     [0 2 -1 0 0 0 0] 1e-09;         // Diffusivity of limiting nutrient
+
+Binf  [1 -3 0 0 0 0 0]   100;      // kg/m^3 wet biomass + EPS at maximum capacity
+Y     [1 0 0 0 -1 0 0]   0.0055;   // kg biomass per mol substrate, yield
+Ks    [0 -3 0 0 1 0 0]   0.1;      // mol/m^3, Monod half-saturation constant, same units as C
+mu    [0 0 -1 0 0 0 0]  1.2e-3;   // biofilm maximum growth rate
+
+// all the factors for biomass diffusivity calculations
+delta [0 2 -1 0 0 0 0]  1e-17;   // biomass spreading prefactor
+a       4;
+b       4;

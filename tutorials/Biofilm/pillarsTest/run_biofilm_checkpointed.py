@@ -742,7 +742,7 @@ for step in range(start_step, no_steps):
 
     BField = utils.to_1d(Balive2D, image_cell_values)
     BDeadField = utils.to_1d(Bdead2D, image_cell_values)
-    tau0Field = utils.to_1d(tau02D, image_cell_values)
+    tau0Field = utils.to_1d(tau02D, image_cell_values)c
     alphaWaterField = utils.to_1d(alphaWater, image_cell_values)
 
     with caseYieldStress[-1]["B"] as field:

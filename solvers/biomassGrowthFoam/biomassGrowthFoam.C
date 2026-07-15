@@ -69,13 +69,25 @@ int main(int argc, char *argv[])
         // // #include "alphaCourantNo.H"
         // #include "setDeltaT.H"
 
+        Info<< "max |div(phi)| = "
+            << gMax(mag(fvc::div(phi)().primitiveField())) << endl;
+        
+        // solve for substrate concentration field, advection-diffusion-reaction
         #include "CEqn.H"
         
+        // solve for biofilm growth, sharp-front diffusion as per Eberl et al. 2001
         #include "BEqn.H"
 
+        // solve for autoinducer concentration
+        #include "AEqn.H"
 
         runTime.write();
+        runTime.printExecutionTime(Info);
     }
+
+    // biofilm is the non-water phase: keep alpha.water consistent with the grown B
+    alphaWater = 1.0 - B;
+    alphaWater.correctBoundaryConditions();
 
     Info<< "End\n" << endl;
 
